@@ -1,14 +1,18 @@
-package handlers
+package utils
 
 import (
 	"encoding/base64"
-	"image-creator/codeToImage/codeToImage"
-	"io/ioutil"
+	"image-creator/codeToImage"
+	"io"
 	"log"
 	"os"
 )
 
-func getImage(isUpdate bool, code string) (string, error) {
+const (
+	url = "https://login.cloudtvos.com/"
+)
+
+func GetImage(isUpdate bool, code string) (string, error) {
 	imagePath, err := codeToImage.GenerateImage(isUpdate, code, url)
 	if err != nil {
 		log.Printf("Error generating image: %v\n", err)
@@ -24,7 +28,7 @@ func getImage(isUpdate bool, code string) (string, error) {
 	defer imageFile.Close()
 
 	// Read the image file into a byte slice (all binary data)
-	imageData, err := ioutil.ReadAll(imageFile)
+	imageData, err := io.ReadAll(imageFile)
 	if err != nil {
 		log.Printf("Error reading image file: %v\n", err)
 		return "", err

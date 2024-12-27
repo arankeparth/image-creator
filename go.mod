@@ -9,7 +9,5 @@ require (
 
 require (
 	github.com/chai2010/webp v1.1.1
-	golang.org/x/image v0.23.0
+	golang.org/x/image v0.23.0 // indirect
 )
-
-require github.com/fogleman/gg v1.3.0

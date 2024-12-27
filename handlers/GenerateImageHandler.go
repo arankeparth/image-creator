@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"image-creator/spec"
+	"image-creator/utils"
 	"log"
 	"net/http"
 )
@@ -26,7 +27,7 @@ func GenerateImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a map or struct to hold the JSON response
-	content, err := getImage(req.IsUpdate, req.Code)
+	content, err := utils.GetImage(req.IsUpdate, req.Code)
 	if err != nil {
 		log.Printf("Failed to generate image: %v\n", err)
 		http.Error(w, "Failed to generate image", http.StatusInternalServerError)

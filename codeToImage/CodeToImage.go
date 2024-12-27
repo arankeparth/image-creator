@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	fontPath           = "./codeToImage/codeToImage/fonts/NotoSans-Regular.ttf"
-	editProfileImage   = "./codeToImage/codeToImage/EditProfile.webp"
-	createProfileImage = "./codeToImage/codeToImage/CreateProfile.webp"
+	fontPath           = "./codeToImage/fonts/NotoSans-Regular.ttf"
+	editProfileImage   = "./codeToImage/EditProfile.webp"
+	createProfileImage = "./codeToImage/CreateProfile.webp"
 	fontSize           = 30.0
 	qrCodeSize         = 300
 	qrPosX             = 1320
