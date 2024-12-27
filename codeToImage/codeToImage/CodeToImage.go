@@ -68,7 +68,7 @@ func GenerateImage(isUpdate bool, cwToken string, valueofURL string) (string, er
 		return "", err
 	}
 
-	fg := image.NewUniform(color.RGBA{R: 255, G: 255, B: 255, A: 255}) // Text color
+	fg := image.NewUniform(color.RGBA{R: 4, G: 186, B: 250, A: 255}) // Text color
 	drawer := freetype.NewContext()
 	drawer.SetFontSize(fontSize)
 	drawer.SetClip(img.Bounds()) // Ensure drawing is within bounds
