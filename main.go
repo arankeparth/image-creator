@@ -1,20 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"image-creator/handlers"
 	"image-creator/spec"
+	"log"
 	"net/http"
 )
 
 func main() {
 	// Register HTTP handlers
-	http.HandleFunc(spec.LoginPath, handlers.LoginHandler)
-	http.HandleFunc(spec.UpdatePath, handlers.UpdateHandler)
+	http.HandleFunc(spec.GenerateImagePath, handlers.GenerateImageHandler)
 	// Start the HTTP server
 	port := ":8081"
-	fmt.Printf("Server is running on port %s...\n", port)
+	log.Printf("Server is running on port %s...\n", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
-		fmt.Printf("Failed to start server: %v\n", err)
+		log.Fatalf("Failed to start server: %v\n", err)
 	}
 }
