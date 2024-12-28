@@ -1,13 +1,15 @@
 package codeToImage
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"image/png"
 	"os"
-
-	"github.com/chai2010/webp"
+	"sync"
 
 	"github.com/golang/freetype"
 	"github.com/skip2/go-qrcode"
@@ -15,8 +17,8 @@ import (
 
 const (
 	fontPath           = "./codeToImage/fonts/NotoSans-Regular.ttf"
-	editProfileImage   = "./codeToImage/EditProfile.webp"
-	createProfileImage = "./codeToImage/CreateProfile.webp"
+	editProfileImage   = "./codeToImage/EditProfile.png"
+	createProfileImage = "./codeToImage/CreateProfile.png"
 	fontSize           = 30.0
 	qrCodeSize         = 300
 	qrPosX             = 1320
@@ -34,6 +36,22 @@ func GenerateImage(isUpdate bool, cwToken string, valueofURL string) (string, er
 	}
 
 	qrCodeLink := valueofURL + cwToken
+
+	var wg sync.WaitGroup
+	var qrImage image.Image
+	var qrErr error
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// Generate the QR code
+		qr, err := qrcode.New(qrCodeLink, qrcode.Medium)
+		if err != nil {
+			qrErr = err
+			return
+		}
+		qrImage = qr.Image(qrCodeSize) // 300x300 pixels
+	}()
 
 	// Load the font
 	fontBytes, err := os.ReadFile(fontPath)
@@ -62,9 +80,9 @@ func GenerateImage(isUpdate bool, cwToken string, valueofURL string) (string, er
 	}
 	defer inputFile.Close()
 
-	img, err := webp.Decode(inputFile)
+	img, err := png.Decode(inputFile)
 	if err != nil {
-		fmt.Printf("Error decoding webp file: %v\n", err)
+		fmt.Printf("Error decoding png file: %v\n", err)
 		return "", err
 	}
 
@@ -83,13 +101,11 @@ func GenerateImage(isUpdate bool, cwToken string, valueofURL string) (string, er
 		return "", err
 	}
 
-	// Generate the QR code
-	qr, err := qrcode.New(qrCodeLink, qrcode.Medium)
-	if err != nil {
-		fmt.Printf("Error generating QR code: %v\n", err)
-		return "", err
+	wg.Wait()
+	if qrErr != nil {
+		fmt.Printf("Error generating QR code: %v\n", qrErr)
+		return "", qrErr
 	}
-	qrImage := qr.Image(qrCodeSize) // 300x300 pixels
 
 	// Place the QR code on the image at a specific position
 	qrPos := image.Point{X: qrPosX, Y: qrPosY}
@@ -97,20 +113,16 @@ func GenerateImage(isUpdate bool, cwToken string, valueofURL string) (string, er
 	rect := image.Rectangle{Min: qrPos, Max: qrPos.Add(b.Size())}
 	draw.Draw(img.(draw.Image), rect, qrImage, b.Min, draw.Over)
 
-	// Save the final image
-	outputFilePath := fmt.Sprintf("%s.webp", cwToken)
-	outputFile, err := os.Create(outputFilePath)
+	// Encode the final image to PNG format
+	var buf bytes.Buffer
+	err = png.Encode(&buf, img)
 	if err != nil {
-		fmt.Printf("Error creating output file: %v\n", err)
-		return "", err
-	}
-	defer outputFile.Close()
-
-	err = webp.Encode(outputFile, img, &webp.Options{Lossless: true})
-	if err != nil {
-		fmt.Printf("Error saving webp file: %v\n", err)
+		fmt.Printf("Error encoding png file: %v\n", err)
 		return "", err
 	}
 
-	return outputFilePath, nil
+	// Convert the encoded image to a Base64 string
+	base64Str := base64.StdEncoding.EncodeToString(buf.Bytes())
+
+	return base64Str, nil
 }

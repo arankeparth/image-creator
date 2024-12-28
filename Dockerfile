@@ -28,17 +28,16 @@ RUN apt-get update && apt-get install -y libc6
 # Set the Current Working Directory inside the container
 WORKDIR /root/
 
-
-
 # Copy the compiled Go binary from the builder stage
-
 COPY --from=builder /app/main .
 COPY --from=builder /app/codeToImage/fonts /root/codeToImage/fonts
+COPY --from=builder /app/codeToImage/EditProfile.png /root/codeToImage/EditProfile.png
+COPY --from=builder /app/codeToImage/CreateProfile.png /root/codeToImage/CreateProfile.png
 COPY --from=builder /app/codeToImage/EditProfile.webp /root/codeToImage/EditProfile.webp
 COPY --from=builder /app/codeToImage/CreateProfile.webp /root/codeToImage/CreateProfile.webp
 
 # Expose port 8081 to the outside world
-EXPOSE 8081
+EXPOSE 8081 6060
 
 # Command to run the executable
 CMD ["./main"]

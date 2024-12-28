@@ -3,9 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"image-creator/spec"
-	"image-creator/utils"
+	"image-creator/codeToImage"
 	"log"
 	"net/http"
+)
+
+const (
+	url = "https://login.cloudtvos.com/"
 )
 
 func GenerateImageHandler(w http.ResponseWriter, r *http.Request) {
@@ -27,10 +31,10 @@ func GenerateImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a map or struct to hold the JSON response
-	content, err := utils.GetImage(req.IsUpdate, req.Code)
+	content, err := codeToImage.GenerateImage(req.IsUpdate, req.Code, url)
 	if err != nil {
-		log.Printf("Failed to generate image: %v\n", err)
-		http.Error(w, "Failed to generate image", http.StatusInternalServerError)
+		log.Printf("Failed to generate image: %s\n", err.Error())
+		http.Error(w, "Failed to generate image", http.StatusBadRequest)
 		return
 	}
 
